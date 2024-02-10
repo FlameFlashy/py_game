@@ -33,19 +33,32 @@ def create_enemy():
 
 CREATE_ENEMY = pygame.USEREVENT + 1
 pygame.time.set_timer(CREATE_ENEMY, 1500)
-
 enemies = []
+
+def create_bonus():
+    bonus_size= (20, 20)
+    bonus = pygame.Surface(bonus_size)
+    bonus.fill(COLOR_GREEN)
+    bonus_rect = pygame.Rect(random.randint(0, HEIGHT), 0, *bonus_size)
+    bonus_move = [0, random.randint(1, 6)]
+    return [bonus, bonus_rect, bonus_move]
+
+CREATE_BONUS = pygame.USEREVENT + 2
+pygame.time.set_timer(CREATE_BONUS, 1500)
+bonuses = []
 
 playing = True
 
 while playing:
-    FPS.tick(300)
+    FPS.tick(200)
 
     for event in pygame.event.get():
         if event.type == QUIT:
             playing = False
         if event.type == CREATE_ENEMY:
             enemies.append(create_enemy())
+        if event.type == CREATE_BONUS:
+            bonuses.append(create_bonus())
 
     main_display.fill(COLOR_BLACK)
 
@@ -67,12 +80,21 @@ while playing:
         enemy[1] = enemy[1].move(enemy[2])
         main_display.blit(enemy[0], enemy[1])
 
+    for bonus in bonuses:
+        bonus[1] = bonus[1].move(bonus[2])
+        main_display.blit(bonus[0], bonus[1])
+
     main_display.blit(player, player_rect)
 
-    print(len(enemies))
+    print(len(enemies), "enemi")
+    print(len(bonuses), "bonus")
 
     pygame.display.flip()
 
     for enemy in enemies:
         if enemy[1].left < 0:
             enemies.pop(enemies.index(enemy))
+    
+    for bonus in bonuses:
+        if bonus[1].bottom > HEIGHT:
+            bonuses.pop(bonuses.index(bonus))
